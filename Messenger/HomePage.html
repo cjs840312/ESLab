@@ -1,20 +1,35 @@
 <html>
-  <head>
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <script>
-      var socket = io.connect();
+   <head>
+      <script src="/socket.io/socket.io.js"></script>
+   </head>
+   <body>
 
-      socket.on('message', function(data){
-        console.log(data.message);
-      });
-      
-    </script>
+      <h1> Welcome to messenger !! </h1>
+      <fieldset>
+         Account  : <input type="text"    , id = "account">     <br>
+         Password : <input type="password", id = "password"> <br>
+      </fieldset>
+      <input type =submit value="Login" id="LogButton" >
 
-    <h1> Welcome to messenger !! </h1>
+      <script>
+         var socket = io.connect();
 
+         var name = prompt("請輸入暱稱","guest");
 
+         socket.emit("add user",name);
+
+         socket.on('add user',function(data){
+           console.log(data.username+"已加入");
+         });
+
+         var LogButton= document.getElementById("LogButton");
+         LogButton.addEventListener("click",function(){
+            console.log('try to log in')         
+            var account= document.getElementById("account").value;
+            var password= document.getElementById("password").value;
+            socket.emit("User Login",{"account":account,"password":password});
+         })
+      </script>
 
   </body>
 </html>
