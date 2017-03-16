@@ -14,14 +14,6 @@
       <script>
          var socket = io.connect();
 
-         var name = prompt("請輸入暱稱","guest");
-
-         socket.emit("add user",name);
-
-         socket.on('add user',function(data){
-           console.log(data.username+"已加入");
-         });
-
          var LogButton= document.getElementById("LogButton");
          LogButton.addEventListener("click",function(){
             console.log('try to log in')         

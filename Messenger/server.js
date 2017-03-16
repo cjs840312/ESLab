@@ -36,15 +36,6 @@ var server_io = socket_io.listen(server);
 
 server_io.sockets.on('connection', function(socket)  {
 
-  socket.on('add user',function(msg){
-      socket.username = msg;
-      process.stdout.write("new user:"+msg+" logged.\n");
-
-      socket.emit('add user',{
-        username: socket.username
-      });
-    });
-
   socket.on('User Login',function(userData){
       account = userData.account
       password = userData.password
