@@ -1,7 +1,7 @@
 var http = require("http");
 var url = require('url');
 var fs = require('fs');
-var io = require('socket.io');
+var socket_io = require('socket.io');
 
 console.log('Server starts...')
 
@@ -30,5 +30,10 @@ var server = http.createServer(function(request, response) {
   }
 });
 
-server.listen(8001);
-io.listen(server);
+server.listen(3000);
+
+var server_io = socket_io.listen(server);
+
+server_io.sockets.on('connection', function(socket) {
+    socket.emit('message', {'message': 'hello world'});
+});
