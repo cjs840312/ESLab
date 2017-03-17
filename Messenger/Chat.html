@@ -1,0 +1,37 @@
+<html>
+   <head>
+      <script src="/socket.io/socket.io.js">
+      </script>
+   </head>
+   <body>
+      <h1> Chat Room ~ </h1>
+
+      <div id="ChatScreen" style="width:497px;height:200px;border:1px #000000 solid; overflow:auto; white-space: pre-line;word-break: break-all;"></div>
+
+      <br>
+
+      <form method="post">
+         <textarea name="text" rows="5" cols="60" id="message"></textarea>
+         <input type="button" value="Send" id="SendButton"/>
+      </form>
+
+
+      <script>
+         var socket = io.connect();
+         var SendButton= document.getElementById("SendButton");
+         
+         SendButton.addEventListener("click",function(){
+            console.log('Sending Message')         
+            var message= document.getElementById("message").value;
+            socket.emit("Send Message",{"message":message});
+            document.getElementById("message").value="";
+         })
+
+         var screen = document.getElementById("ChatScreen");
+
+         screen.textContent = "chatting~~~";
+
+      </script>
+
+   </body>
+</html>
