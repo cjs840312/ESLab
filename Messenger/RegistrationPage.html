@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<h1> Register for an Account!!!</h1>
+		Account : <input type="text", id="account"> <br>
+		Password: <input type="password", id = "password"> <br>
+		<input type=submit value="Done", id = "Button", onclick="goHome();">
+		<script>
+			//var socket = io.connect();
+			
+			function goHome(){
+				alert("Moving back to Login Webpage");
+				window.location.href="http://localhost:3000";
+			}			
+			
+			/*
+			var Button = document.getElementById("Button");
+			Button.addEventListener("click", functioin(){
+				console.log('registeration processing...')
+				var account = document.getElementById("account").value;
+				var password = document.getElementById("password").value;
+				socket.emit("User Login",{"account":account,"password":password});
+			})
+			*/
+		</script>
+	</body>
+</html>			
+
+			
