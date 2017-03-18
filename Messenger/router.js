@@ -4,17 +4,20 @@ var querystring = require('querystring');
 
 var router=exports;
 
+function error404(response){
+  response.writeHead(404);
+  response.write("opps this doesn't exist - 404");
+  response.end();
+}
 function toHTML(path,response){
   fs.readFile(__dirname + path, function(error, data) {
     if (error){
-      response.writeHead(404);
-      response.write("opps this doesn't exist - 404");
+      error404(response);
     } else {
       response.writeHead(200, {"Content-Type": "text/html"});
-
       response.write(data, "utf8");
+      response.end();
     }
-    response.end();
   });
 }
 
