@@ -27,11 +27,20 @@ router.route=function route(request,response){
 
   switch (path) {
     case '/':
-      toHTML("/HomePage.html",response);
+      fs.readFile(__dirname + "/HomePage.html", function(error, data) {
+        if (error){
+          error404(response);
+        } else {
+          response.writeHead(200, {"Content-Type": "text/html",'Set-Cookie': "account=; expires="+ new Date(0)});
+          response.write(data, "utf8");
+          response.end();
+        }
+      });
       break;
     case '/RegistrationPage.html':
     case '/MainBoard.html':
     case '/Chat.html':
+      console.log(request.headers.cookie)
       toHTML(path,response);
       break;
     case '/login':
@@ -42,9 +51,20 @@ router.route=function route(request,response){
       request.on("end", function() {
         var user;
         user = querystring.parse(formData);
-        console.log(user.account)
-        console.log(user.password)
-        toHTML("/MainBoard.html", response); });
+        account=user.account
+        console.log(account)
+        console.log(user.password) 
+        fs.readFile(__dirname + "/MainBoard.html", function(error, data) {
+          if (error){
+              error404(response);
+          } else {
+            console.log("account=; expires="+Date(Date.now()))
+            response.writeHead(200, {"Content-Type": "text/html",'Set-Cookie': "account="+account});
+            response.write(data, "utf8");
+            response.end();
+          }
+        });
+      });
       break;
     case '/add':
       formData = '';
