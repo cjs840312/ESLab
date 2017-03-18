@@ -10,11 +10,22 @@ server.listen(3000);
 
 var server_io = socket_io.listen(server);
 
+socketDict={}
+
 server_io.sockets.on('connection', function(socket)  {
 
-  socket.on('Send Message',function(Data){
+  socket.on('myName',function(name){
+      socket.name = name;
+      socketDict[name]=socket.id
+      console.log(name);
+  });
+
+
+  socket.on('Message',function(Data){
       var message = Data.message
-      process.stdout.write( message+"\n");
-    });
+      var receiver= Data.receiver
+      console.log( receiver+": "+message);
+      server_io.to(socketDict[receiver]).emit("Message",{sender:socket.name,message:message})
+  });
 
 });
