@@ -3,6 +3,7 @@ var fs = require('fs');
 var querystring = require('querystring');
 
 var router=exports;
+var user;
 
 function error404(response){
   response.writeHead(404);
@@ -40,10 +41,11 @@ router.route=function route(request,response){
         formData += data;
       });
       request.on("end", function() {
-        var user;
-        user = querystring.parse(formData);
-        console.log(user.account)
-        console.log(user.password)});
+        //var user;
+        user = querystring.parse(formData).account;
+        //console.log(user.account)
+        //console.log(user.password)
+        toHTML("/MainBoard.html", response); });
       break;
     case '/add':
       formData = '';
@@ -51,9 +53,10 @@ router.route=function route(request,response){
         formData += data;
       });
       request.on("end", function() {
-        var user;
-        user = querystring.parse(formData);
-        console.log(user.account); 
+        var add;
+        add = querystring.parse(formData);
+        console.log(user);
+        console.log(add.account); 
         toHTML("/MainBoard.html",response); });
       break;
 
