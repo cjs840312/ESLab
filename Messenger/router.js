@@ -42,6 +42,18 @@ router.route=function route(request,response){
         console.log(user.account)
         console.log(user.password)});
       break;
+    case '/add':
+      formData = '';
+      request.on("data", function(data) {
+        formData += data;
+      });
+      request.on("end", function() {
+        var user;
+        user = querystring.parse(formData);
+        console.log(user.account); 
+        toHTML("/MainBoard.html",response); });
+      break;
+
     default:
       error404(response);
       break;
