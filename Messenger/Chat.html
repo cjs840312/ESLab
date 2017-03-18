@@ -5,12 +5,6 @@
    </head>
    <body>
       <h1> Chat Room ~ </h1>
-      <textarea name="username" rows="2" cols="10" id="username"></textarea>
-      <input type="button" value="name" id="pass_name"/>
-
-      <textarea  rows="2" cols="10" id="receiver"></textarea>
-
-
       <div id="ChatScreen" style="width:497px;height:200px;border:1px #000000 solid; overflow:auto; white-space: pre-line;word-break: break-all;"></div>
 
       <br>
@@ -23,36 +17,33 @@
 
       <script>
          var socket = io.connect();
-         var name;
          var screen = document.getElementById("ChatScreen");
 
-         var pass_name= document.getElementById("pass_name");         
-         pass_name.addEventListener("click",function(){
-            console.log('pass_name')
-            name= document.getElementById("username").value;
-            socket.emit("myName",name);
-         })
-
+         var myName,receiver
+         socket.emit("whoIsChatting",document.cookie);
+         socket.on("chatPair",function(Data){
+            console.log(Data);
+            myName=Data.sender;
+            receiver=Data.receiver;
+         });
+         
 
          var SendButton= document.getElementById("SendButton");         
          SendButton.addEventListener("click",function(){
             console.log('Sending Message')         
             var message= document.getElementById("message").value;
-            var receiver=document.getElementById("receiver").value
 
             socket.emit("Message",{receiver:receiver,"message":message});
             document.getElementById("message").value="";
-            screen.textContent +=(name+": "+message+"\n"); 
-         })
-
-
+            screen.textContent +=(myName+": "+message+"\n"); 
+         });
          
          socket.on("Message",function(Data){
             console.log('Printing Message') 
             var sender=Data.sender 
             var message=Data.message
             screen.textContent +=(sender+": "+message+"\n"); 
-         })
+         });
 
       </script>
 

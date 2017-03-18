@@ -1,7 +1,7 @@
 var http = require("http");
 var socket_io = require('socket.io');
 var router=require('./router')
-
+var cookie=require('cookie')
 console.log('Server starts...')
 
 var server = http.createServer(router.route);
@@ -14,10 +14,11 @@ socketDict={}
 
 server_io.sockets.on('connection', function(socket)  {
 
-  socket.on('myName',function(name){
-      socket.name = name;
-      socketDict[name]=socket.id
-      console.log(name);
+  socket.on('whoIsChatting',function(cookieStr){
+      cookieJSON=cookie.parse(cookieStr)
+      socketDict[cookieJSON.account]=socket.id
+      console.log(cookieJSON);
+      socket.emit('chatPair',{sender:cookieJSON.account,receiver:"someone"})
   });
 
 

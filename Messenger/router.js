@@ -40,30 +40,20 @@ router.route=function route(request,response){
     case '/RegistrationPage.html':
     case '/MainBoard.html':
     case '/Chat.html':
-      console.log(request.headers.cookie)
       toHTML(path,response);
       break;
     case '/login':
       formData = '';
-      request.on("data", function(data) {
-        formData += data;
-      });
+      request.on("data", function(data) { formData += data;});
       request.on("end", function() {
         var user;
         user = querystring.parse(formData);
-        account=user.account
-        console.log(account)
-        console.log(user.password) 
-        fs.readFile(__dirname + "/MainBoard.html", function(error, data) {
-          if (error){
-              error404(response);
-          } else {
-            console.log("account=; expires="+Date(Date.now()))
-            response.writeHead(200, {"Content-Type": "text/html",'Set-Cookie': "account="+account});
-            response.write(data, "utf8");
-            response.end();
-          }
-        });
+        account=user.account;
+        password=user.password;
+        console.log(account);
+        console.log(password);
+        response.writeHead(303, {"Location": "./MainBoard.html","Content-Type": "text/html",'Set-Cookie': "account="+account});
+        response.end();
       });
       break;
     case '/add':
