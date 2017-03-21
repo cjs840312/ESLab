@@ -20,7 +20,7 @@
          var screen = document.getElementById("ChatScreen");
 
          var myName,receiver
-         socket.emit("whoIsChatting",document.cookie);
+         socket.emit("myHistory",document.cookie);
          socket.on("chatPair",function(Data){
             console.log(Data);
             myName=Data.sender;
@@ -35,14 +35,16 @@
 
             socket.emit("Message",{receiver:receiver,"message":message});
             document.getElementById("message").value="";
-            screen.textContent +=(myName+": "+message+"\n"); 
+            screen.textContent +=(myName+": "+message+"\n");
+            screen.scrollTop=screen.scrollTopMax;
          });
          
          socket.on("Message",function(Data){
             console.log('Printing Message') 
             var sender=Data.sender 
             var message=Data.message
-            screen.textContent +=(sender+": "+message+"\n"); 
+            screen.textContent +=(sender+": "+message+"\n");
+            screen.scrollTop=screen.scrollTopMax;
          });
 
       </script>
