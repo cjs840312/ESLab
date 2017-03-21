@@ -9,6 +9,7 @@ function error404(response){
   response.write("opps this doesn't exist - 404");
   response.end();
 }
+
 function toHTML(path,response){
   fs.readFile(__dirname + path, function(error, data) {
     if (error){

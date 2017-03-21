@@ -19,25 +19,45 @@
          var socket = io.connect();
          var screen = document.getElementById("ChatScreen");
 
-         var myName,receiver
-         socket.emit("myHistory",document.cookie);
+         var myName,receiver,hisLog;
+         socket.emit("whoIsChatting",document.cookie);
          socket.on("chatPair",function(Data){
             console.log(Data);
             myName=Data.sender;
             receiver=Data.receiver;
+            hisLog=Data.history;
+
+            for (i = hisLog.length-1; i >=0; i--) { 
+               screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
+               screen.scrollTop=screen.scrollTopMax;
+            }
+            console.log(hisLog);
          });
          
 
-         var SendButton= document.getElementById("SendButton");         
+         var SendButton= document.getElementById("SendButton");
+         var textBox = document.getElementById("message");
+
          SendButton.addEventListener("click",function(){
             console.log('Sending Message')         
             var message= document.getElementById("message").value;
 
             socket.emit("Message",{receiver:receiver,"message":message});
-            document.getElementById("message").value="";
+
+            textBox.value="";
             screen.textContent +=(myName+": "+message+"\n");
             screen.scrollTop=screen.scrollTopMax;
          });
+
+         var textBox = document.getElementById("message");
+         textBox.addEventListener("keydown", function(event) {
+            if (event.keyCode == 13 && !event.shiftKey) {
+               event.preventDefault();
+               textBox.value=textBox.value.trim();
+               SendButton.click();
+            };
+         });
+
          
          socket.on("Message",function(Data){
             console.log('Printing Message') 

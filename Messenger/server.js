@@ -26,12 +26,23 @@ socketDict={}
 
 server_io.sockets.on('connection', function(socket)  {
 
-  socket.on('myHistory',function(cookieStr){
+  socket.on('whoIsChatting',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
-      socketDict[cookieJSON.account]=socket.id;
-      socket.name=cookieJSON.account;
       console.log(cookieJSON);
-      socket.emit('chatPair',{sender:cookieJSON.account,receiver:cookieJSON.receiver})
+
+      var sender = cookieJSON.account;
+      var receiver = cookieJSON.receiver;
+
+      socketDict[sender]=socket.id;
+      socket.name=sender;
+
+      var q = 'select * from mydb.ChatHistory where (Sender like "'+sender+'" and Receiver like "'+receiver+'") or (Sender like "'+receiver+'" and Receiver like "'+sender+'") order by Time desc limit 5 ;';
+      sql.query(q, function(err, rows) {
+        if (err)
+          console.error(err);
+        console.dir(rows);
+        socket.emit('chatPair',{"sender":sender,"receiver":receiver,"history":rows})
+      });      
   });
 
 
