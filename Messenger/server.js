@@ -11,15 +11,9 @@ server.listen(3000);
 var sql = new mariasql({
   host: '127.0.0.1',
   user: 'guest',
-  password: '1234567890'
+  password: '1234567890',
+  db: 'mydb'
 });
-
-sql.query('use mydb', function(err, rows) {
-  console.log("using mydb");
-});
-
-
-
 
 var server_io = socket_io.listen(server);
 socketDict={}
@@ -58,6 +52,35 @@ server_io.sockets.on('connection', function(socket)  {
         console.dir(rows);
       });
 
+  });
+  
+  socket.on('showFriendList',function(cookieStr){
+      cookieJSON=cookie.parse(cookieStr);
+      var user = cookieJSON.account;
+      
+      var q = 'select * from Friends where usr=:usr';
+      sql.query(q, {usr: user}, function(err, result) {
+        if (err) throw err;
+        socket.emit('friendList', result);
+      });      
+  });
+  
+  socket.on('addFriend',function(cookieStr){
+      cookieJSON=cookie.parse(cookieStr);
+      var user = cookieJSON.account;
+      var add = cookieJSON.receiver;
+      //TODO check whether account exists
+      var q = 'select * from Friends where usr=:usr and friend=:friend';
+      sql.query(q, {usr: user, friend: add}, function(err, result) {
+        if (err) throw err;
+        if(result.length>0) console.log("already added");
+        else{
+          var q = 'insert into Friends values (:usr, :friend)';
+          sql.query(q, {usr: user, friend: add});
+          sql.query(q, {usr: add, friend: user});
+          socket.emit('addLink', add);
+        }
+      });      
   });
 });
 

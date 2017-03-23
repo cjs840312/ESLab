@@ -22,7 +22,6 @@
          var myName,receiver,hisLog;
          socket.emit("whoIsChatting",document.cookie);
          socket.on("chatPair",function(Data){
-            console.log(Data);
             myName=Data.sender;
             receiver=Data.receiver;
             hisLog=Data.history;

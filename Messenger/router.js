@@ -57,18 +57,6 @@ router.route=function route(request,response){
         response.end();
       });
       break;
-    case '/add':
-      formData = '';
-      request.on("data", function(data) {
-        formData += data;
-      });
-      request.on("end", function() {
-        var add;
-        add = querystring.parse(formData);
-        console.log(add.account); 
-        toHTML("/MainBoard.html",response); });
-      break;
-
     default:
       error404(response);
       break;

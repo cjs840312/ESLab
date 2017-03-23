@@ -1,18 +1,56 @@
 <html>
    <head>
       <script src="/socket.io/socket.io.js"></script>
-      <script src="friend.js"></script>
    </head>
    <body>
 
       <h1> Friend List</h1>
-      <form method="post" action="./add">
+      <form method="post">
          <fieldset>
-            <label>Account : </label> <input type="text", name="account"/> <br>
-            <input type="submit", value="Add", id="AddButton">
+            <label>Account : </label> <input type="text", id="add"/> <br>
+            <input type="button", value="Add", id="AddButton">
          </fieldset>
       </form>
       <a href="./Chat.html"> chatroom  </a>
+
+      <script>
+         var socket = io.connect();
+         socket.emit("showFriendList", document.cookie);
+         socket.on("friendList", function(Data){
+            for(i=0; i<Data.length; ++i){
+               var user = Data[i].usr;
+               var friend = Data[i].friend;
+               var newDiv = document.createElement('div');
+               var link = document.createElement('a');
+               link.innerHTML = friend;
+               link.href = './Chat.html';
+               link.addEventListener('click', function(ev){
+                  document.cookie = "receiver="+this.innerHTML;
+               }, false);
+               newDiv.appendChild(link);
+               document.body.appendChild(newDiv);
+            }
+         });
+
+         var AddButton = document.getElementById("AddButton");
+         AddButton.addEventListener("click", function(){
+            document.cookie = "receiver="+document.getElementById("add").value;
+            socket.emit("addFriend", document.cookie);  
+         });
+         
+         socket.on("addLink", function(Data){
+            var newFriend = Data;
+            var newDiv = document.createElement('div');
+            var link = document.createElement('a');
+            link.innerHTML = newFriend;
+            link.href = './Chat.html';
+            link.addEventListener('click', function(ev){
+               document.cookie = "receiver="+this.innerHTML;
+            }, false);
+            newDiv.appendChild(link);
+            document.body.appendChild(newDiv);
+         });
+      </script>
    
    </body>
 </html>
