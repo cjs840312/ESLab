@@ -4,21 +4,26 @@
    </head>
    <body>
 
-      <h1> Friend List</h1>
+      <h1> Friend List <button type="button", id="LogoutButton">Logout</button> </h1>
       <form method="post">
-         <fieldset>
-            <label>Account : </label> <input type="text", id="add"/> <br>
-            <input type="button", value="Add", id="AddButton">
-         </fieldset>
+         <label>Account : </label> 
+         <input type="text", id="AddAccount"> 
+         <input type="button", value="Add", id="AddButton">
       </form>
       <a href="./Chat.html"> chatroom  </a>
 
       <script>
          var socket = io.connect();
+         
+         socket.emit("checkLogin", document.cookie);
+         socket.on("notLogin", function(Msg){
+            alert(Msg);
+            location.href="./";
+         });
+
          socket.emit("showFriendList", document.cookie);
          socket.on("friendList", function(Data){
             for(i=0; i<Data.length; ++i){
-               var user = Data[i].usr;
                var friend = Data[i].friend;
                var newDiv = document.createElement('div');
                var link = document.createElement('a');
@@ -32,10 +37,21 @@
             }
          });
 
-         var AddButton = document.getElementById("AddButton");
          AddButton.addEventListener("click", function(){
-            document.cookie = "receiver="+document.getElementById("add").value;
+            document.cookie = "receiver="+AddAccount.value;
             socket.emit("addFriend", document.cookie);  
+         });
+         
+         AddAccount.addEventListener("keydown", function(event) {
+            if (event.keyCode == 13) {
+               event.preventDefault();
+               AddButton.click();
+            };
+         });
+
+         LogoutButton.addEventListener("click", function(){
+            document.cookie = "account=";
+            location.href = "./";
          });
          
          socket.on("addLink", function(Data){
@@ -50,6 +66,12 @@
             newDiv.appendChild(link);
             document.body.appendChild(newDiv);
          });
+
+         socket.on("errMessage", function(Msg){
+            alert(Msg);
+         });
+
+
       </script>
    
    </body>

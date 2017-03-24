@@ -4,7 +4,7 @@
       </script>
    </head>
    <body>
-      <h1> Chat Room ~ </h1>
+      <h1> Chat Room ~ <button type="button", id="LogoutButton">Logout</button></h1>
       <div id="ChatScreen" style="width:497px;height:200px;border:1px #000000 solid; overflow:auto; white-space: pre-line;word-break: break-all;"></div>
 
       <br>
@@ -17,6 +17,13 @@
 
       <script>
          var socket = io.connect();
+         
+         socket.emit("checkLogin", document.cookie);
+         socket.on("notLogin", function(Msg){
+            alert(Msg);
+            location.href="./";
+         });
+
          var screen = document.getElementById("ChatScreen");
 
          var myName,receiver,hisLog;
@@ -48,7 +55,6 @@
             screen.scrollTop=screen.scrollTopMax;
          });
 
-         var textBox = document.getElementById("message");
          textBox.addEventListener("keydown", function(event) {
             if (event.keyCode == 13 && !event.shiftKey) {
                event.preventDefault();
@@ -64,6 +70,11 @@
             var message=Data.message
             screen.textContent +=(sender+": "+message+"\n");
             screen.scrollTop=screen.scrollTopMax;
+         });
+
+         LogoutButton.addEventListener("click", function(){
+            document.cookie = "account=";
+            location.href = "./";
          });
 
       </script>

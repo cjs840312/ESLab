@@ -19,6 +19,11 @@ var server_io = socket_io.listen(server);
 socketDict={}
 
 server_io.sockets.on('connection', function(socket)  {
+  socket.on('checkLogin', function(cookieStr){
+    cookieJSON = cookie.parse(cookieStr);
+    var account = cookieJSON.account;
+    if(account == undefined) socket.emit('notLogin', "Please login!");
+  });
 
   socket.on('whoIsChatting',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
@@ -39,7 +44,6 @@ server_io.sockets.on('connection', function(socket)  {
       });      
   });
 
-
   socket.on('Message',function(Data){
       var message = Data.message
       var receiver= Data.receiver
@@ -58,7 +62,10 @@ server_io.sockets.on('connection', function(socket)  {
       cookieJSON=cookie.parse(cookieStr);
       var user = cookieJSON.account;
       
-      var q = 'select * from Friends where usr=:usr';
+      socketDict[user] = socket.id;
+      socket.name = user;
+      
+      var q = 'select friend from Friends where usr=:usr';
       sql.query(q, {usr: user}, function(err, result) {
         if (err) throw err;
         socket.emit('friendList', result);
@@ -66,21 +73,35 @@ server_io.sockets.on('connection', function(socket)  {
   });
   
   socket.on('addFriend',function(cookieStr){
-      cookieJSON=cookie.parse(cookieStr);
-      var user = cookieJSON.account;
-      var add = cookieJSON.receiver;
-      //TODO check whether account exists
-      var q = 'select * from Friends where usr=:usr and friend=:friend';
-      sql.query(q, {usr: user, friend: add}, function(err, result) {
-        if (err) throw err;
-        if(result.length>0) console.log("already added");
+    cookieJSON=cookie.parse(cookieStr);
+    var user = cookieJSON.account;
+    var add = cookieJSON.receiver;
+      
+    if(user==add) socket.emit('errMessage', "Can't add yourself!");
+    else{      
+      var q = 'select * from UserInfo where Account=:Account';
+      sql.query(q, {Account: add}, function(err, result) {
+        if(err) throw err;
+      	if(!result.length>0) socket.emit('errMessage', "No such user!"); 
         else{
-          var q = 'insert into Friends values (:usr, :friend)';
-          sql.query(q, {usr: user, friend: add});
-          sql.query(q, {usr: add, friend: user});
-          socket.emit('addLink', add);
+          q = 'select * from Friends where usr=:usr and friend=:friend';
+          sql.query(q, {usr: user, friend: add}, function(err, result) {
+            if (err) throw err;
+            if(result.length>0) socket.emit('errMessage', "Already added!");
+            else{  
+              q = 'insert into Friends values (:usr, :friend)';
+              sql.query(q, {usr: user, friend: add});
+              sql.query(q, {usr: add, friend: user});
+              socket.emit('addLink', add);
+            }
+          });
         }
-      });      
+      });
+    }
+  });
+  
+  socket.on('disconnect', function(){
+    delete socketDict[socket.name];
   });
 });
 
