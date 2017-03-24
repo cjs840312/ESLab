@@ -41,7 +41,10 @@ server_io.sockets.on('connection', function(socket)  {
           console.error(err);
         console.dir(rows);
         socket.emit('chatPair',{"sender":sender,"receiver":receiver,"history":rows})
-      });      
+      });   
+        
+      socket.broadcast.emit('whoIsOnline', sender);
+
   });
 
   socket.on('Message',function(Data){
@@ -68,8 +71,15 @@ server_io.sockets.on('connection', function(socket)  {
       var q = 'select friend from Friends where usr=:usr';
       sql.query(q, {usr: user}, function(err, result) {
         if (err) throw err;
-        socket.emit('friendList', result);
+        var isOnline = [];
+        for (i=0; i<result.length; ++i){
+          if(socketDict[result[i].friend] != undefined) isOnline.push(true);
+          else isOnline.push(false);
+        }
+        socket.emit('friendList', {friendList: result, onlineList: isOnline});
       });      
+
+      socket.broadcast.emit('whoIsOnline', user);
   });
   
   socket.on('addFriend',function(cookieStr){
@@ -92,7 +102,12 @@ server_io.sockets.on('connection', function(socket)  {
               q = 'insert into Friends values (:usr, :friend)';
               sql.query(q, {usr: user, friend: add});
               sql.query(q, {usr: add, friend: user});
-              socket.emit('addLink', add);
+              var isOnline;
+              if(socketDict[add]!=undefined) isOnline = true;
+              else isOnline = false;
+              socket.emit('addLink', {add: add, isOnline: isOnline});
+              if(isOnline)
+                server_io.to(socketDict[add]).emit("addLink",{add: user, isOnline: true});
             }
           });
         }
@@ -101,6 +116,7 @@ server_io.sockets.on('connection', function(socket)  {
   });
   
   socket.on('disconnect', function(){
+    socket.broadcast.emit("whoIsOffline", socket.name); 
     delete socketDict[socket.name];
   });
 });

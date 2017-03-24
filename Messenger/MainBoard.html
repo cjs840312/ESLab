@@ -10,7 +10,6 @@
          <input type="text", id="AddAccount"> 
          <input type="button", value="Add", id="AddButton">
       </form>
-      <a href="./Chat.html"> chatroom  </a>
 
       <script>
          var socket = io.connect();
@@ -23,16 +22,40 @@
 
          socket.emit("showFriendList", document.cookie);
          socket.on("friendList", function(Data){
-            for(i=0; i<Data.length; ++i){
-               var friend = Data[i].friend;
+            var friendList = Data.friendList;
+            var onlineList = Data.onlineList;
+            for(i=0; i<friendList.length; ++i){
+               var friend = friendList[i].friend;
                var newDiv = document.createElement('div');
-               var link = document.createElement('a');
-               link.innerHTML = friend;
-               link.href = './Chat.html';
-               link.addEventListener('click', function(ev){
-                  document.cookie = "receiver="+this.innerHTML;
-               }, false);
-               newDiv.appendChild(link);
+               newDiv.id = friend;
+               newDiv.style.display = "block";
+               newDiv.style.width = "300";
+               newDiv.style.height="50";
+               var Account = document.createElement('div');
+               Account.innerHTML = friend;
+               var Online = document.createElement('div');
+               if(onlineList[i])
+                  Online.innerHTML = "&#9679";
+               Online.style.color = "green";
+               Online.style.float = "right";
+               var Preview = document.createElement('div');
+               Preview.innerHTML = "Start chatting!";
+               Preview.style.color = "grey";
+               //Preview.style.fontWeight = "700";
+
+               newDiv.appendChild(Account);
+               newDiv.appendChild(Online);
+               newDiv.appendChild(Preview);
+               newDiv.addEventListener('mouseover', function(){
+                  this.style.backgroundColor = "#E0E0E0";
+               });
+               newDiv.addEventListener('mouseout', function(){
+                  this.style.backgroundColor = "white";
+               });
+               newDiv.addEventListener('click', function(){
+                  document.cookie = "receiver="+this.id;
+                  location.href = "./Chat.html";
+               });
                document.body.appendChild(newDiv);
             }
          });
@@ -55,20 +78,51 @@
          });
          
          socket.on("addLink", function(Data){
-            var newFriend = Data;
+            var newFriend = Data.add;
+            var isOnline = Data.isOnline;
             var newDiv = document.createElement('div');
-            var link = document.createElement('a');
-            link.innerHTML = newFriend;
-            link.href = './Chat.html';
-            link.addEventListener('click', function(ev){
-               document.cookie = "receiver="+this.innerHTML;
-            }, false);
-            newDiv.appendChild(link);
+            newDiv.id = newFriend;
+            newDiv.style.display = "block";
+            newDiv.style.width = "300";
+            newDiv.style.height="50";
+            var Account = document.createElement('div');
+            Account.innerHTML = newFriend;
+            var Online = document.createElement('div');
+            if(isOnline)
+               Online.innerHTML = "&#9679";
+            Online.style.color = "green";
+            Online.style.float = "right";
+            var Preview = document.createElement('div');
+            Preview.innerHTML = "Start chatting!";
+
+            newDiv.appendChild(Account);
+            newDiv.appendChild(Online);
+            newDiv.appendChild(Preview);
+            newDiv.addEventListener('mouseover', function(){
+               this.style.backgroundColor = "#E0E0E0";
+            });
+            newDiv.addEventListener('mouseout', function(){
+               this.style.backgroundColor = "white";
+            });
+            newDiv.addEventListener('click', function(){
+               document.cookie = "receiver="+this.id;
+               location.href = "./Chat.html";
+            });
             document.body.appendChild(newDiv);
          });
 
          socket.on("errMessage", function(Msg){
             alert(Msg);
+         });
+
+         socket.on("whoIsOnline", function(user){
+            var Friend = document.getElementById(user);
+            if(Friend!=undefined) Friend.childNodes[1].innerHTML = "&#9679";
+         });
+
+         socket.on("whoIsOffline", function(user){
+            var Friend = document.getElementById(user);
+            if(Friend!=undefined) Friend.childNodes[1].innerHTML = "";
          });
 
 
