@@ -39,7 +39,6 @@
                Online.style.color = "green";
                Online.style.float = "right";
                var Preview = document.createElement('div');
-               Preview.innerHTML = "Start chatting!";
                Preview.style.color = "grey";
                //Preview.style.fontWeight = "700";
 
@@ -58,6 +57,9 @@
                });
                document.body.appendChild(newDiv);
             }
+
+            for(i=0; i<friendList.length; ++i) 
+              socket.emit("showPreview", friendList[i].friend);
          });
 
          AddButton.addEventListener("click", function(){
@@ -93,7 +95,7 @@
             Online.style.color = "green";
             Online.style.float = "right";
             var Preview = document.createElement('div');
-            Preview.innerHTML = "Start chatting!";
+            Preview.style.color = "grey";
 
             newDiv.appendChild(Account);
             newDiv.appendChild(Online);
@@ -109,6 +111,12 @@
                location.href = "./Chat.html";
             });
             document.body.appendChild(newDiv);
+            socket.emit('showPreview', newFriend);
+         });
+
+         socket.on("Preview", function(Data){
+            var Friend = document.getElementById(Data.friend);
+            Friend.childNodes[2].innerHTML = Data.Msg;
          });
 
          socket.on("errMessage", function(Msg){

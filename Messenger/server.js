@@ -58,6 +58,10 @@ server_io.sockets.on('connection', function(socket)  {
           console.error(err);
         console.dir(rows);
       });
+      
+      var Msg = message;
+      if(message.length>20) Msg = Msg.slice(0,20)+"...";
+      server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg});
 
   });
   
@@ -75,6 +79,7 @@ server_io.sockets.on('connection', function(socket)  {
         for (i=0; i<result.length; ++i){
           if(socketDict[result[i].friend] != undefined) isOnline.push(true);
           else isOnline.push(false);
+
         }
         socket.emit('friendList', {friendList: result, onlineList: isOnline});
       });      
@@ -106,13 +111,27 @@ server_io.sockets.on('connection', function(socket)  {
               if(socketDict[add]!=undefined) isOnline = true;
               else isOnline = false;
               socket.emit('addLink', {add: add, isOnline: isOnline});
-              if(isOnline)
-                server_io.to(socketDict[add]).emit("addLink",{add: user, isOnline: true});
+              server_io.to(socketDict[add]).emit("addLink",{add: user, isOnline: true});
             }
           });
         }
       });
     }
+  });
+
+  socket.on('showPreview', function(friend){
+    var user = socket.name;
+    var q = 'select * from ChatHistory where (Sender=:sender and Receiver=:receiver) or (Sender=:receiver and Receiver=:sender) order by Time desc limit 1';
+    sql.query(q, {sender: user, receiver: friend}, function(err, result){
+      if(result.length>0){
+        var Msg = result[0].Content;
+        if(Msg.length>20) Msg = Msg.slice(0,20)+"...";
+        if(result[0].Sender==user) 
+          socket.emit('Preview', {friend: friend, Msg: 'You: '+Msg});
+        else socket.emit('Preview', {friend: friend, Msg: Msg});
+      }
+      else socket.emit('Preview', {friend: friend, Msg:'Start Chatting!'});
+    });
   });
   
   socket.on('disconnect', function(){
