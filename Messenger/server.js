@@ -35,14 +35,16 @@ server_io.sockets.on('connection', function(socket)  {
       socketDict[sender]=socket.id;
       socket.name=sender;
 
-      var q = 'select * from mydb.ChatHistory where (Sender like "'+sender+'" and Receiver like "'+receiver+'") or (Sender like "'+receiver+'" and Receiver like "'+sender+'") order by Time desc limit 5 ;';
+      var q = 'select * from ChatHistory where (Sender like "'+sender+'" and Receiver like "'+receiver+'") or (Sender like "'+receiver+'" and Receiver like "'+sender+'") order by Time desc limit 5 ;';
       sql.query(q, function(err, rows) {
         if (err)
           console.error(err);
-        console.dir(rows);
         socket.emit('chatPair',{"sender":sender,"receiver":receiver,"history":rows})
       });   
         
+      q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
+      sql.query(q, {sender: receiver, receiver: sender});
+      
       socket.broadcast.emit('whoIsOnline', sender);
 
   });
@@ -53,16 +55,14 @@ server_io.sockets.on('connection', function(socket)  {
       console.log( receiver+": "+message);
       server_io.to(socketDict[receiver]).emit("Message",{sender:socket.name,message:message})
 
-      sql.query('INSERT INTO mydb.ChatHistory value("'+socket.name+'","'+receiver+'","'+message+'",CURRENT_TIMESTAMP )', function(err, rows) {
+      sql.query('INSERT INTO mydb.ChatHistory value("'+socket.name+'","'+receiver+'","'+message+'",CURRENT_TIMESTAMP, false)', function(err, rows) {
         if (err)
           console.error(err);
-        console.dir(rows);
       });
       
       var Msg = message;
       if(message.length>20) Msg = Msg.slice(0,20)+"...";
-      server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg});
-
+      server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, IsRead: false});
   });
   
   socket.on('showFriendList',function(cookieStr){
@@ -125,13 +125,19 @@ server_io.sockets.on('connection', function(socket)  {
     sql.query(q, {sender: user, receiver: friend}, function(err, result){
       if(result.length>0){
         var Msg = result[0].Content;
+        var IsRead = result[0].IsRead;
         if(Msg.length>20) Msg = Msg.slice(0,20)+"...";
         if(result[0].Sender==user) 
-          socket.emit('Preview', {friend: friend, Msg: 'You: '+Msg});
-        else socket.emit('Preview', {friend: friend, Msg: Msg});
+          socket.emit('Preview', {friend: friend, Msg: 'You: '+Msg, IsRead: true});
+        else socket.emit('Preview', {friend: friend, Msg: Msg, IsRead: IsRead});
       }
-      else socket.emit('Preview', {friend: friend, Msg:'Start Chatting!'});
+      else socket.emit('Preview', {friend: friend, Msg:'Start Chatting!', IsRead: true});
     });
+  });
+
+  socket.on('IsRead', function(sender){
+      q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
+      sql.query(q, {sender: sender, receiver: socket.name});
   });
   
   socket.on('disconnect', function(){

@@ -68,8 +68,12 @@
             console.log('Printing Message') 
             var sender=Data.sender 
             var message=Data.message
-            screen.textContent +=(sender+": "+message+"\n");
-            screen.scrollTop=screen.scrollTopMax;
+            if(sender == receiver){
+              screen.textContent +=(sender+": "+message+"\n");
+              screen.scrollTop=screen.scrollTopMax;
+            
+              socket.emit("IsRead", sender);
+            }
          });
 
          LogoutButton.addEventListener("click", function(){

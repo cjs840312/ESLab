@@ -40,7 +40,6 @@
                Online.style.float = "right";
                var Preview = document.createElement('div');
                Preview.style.color = "grey";
-               //Preview.style.fontWeight = "700";
 
                newDiv.appendChild(Account);
                newDiv.appendChild(Online);
@@ -115,8 +114,12 @@
          });
 
          socket.on("Preview", function(Data){
-            var Friend = document.getElementById(Data.friend);
-            Friend.childNodes[2].innerHTML = Data.Msg;
+            var Preview = document.getElementById(Data.friend).childNodes[2];
+            Preview.innerHTML = Data.Msg;
+            if(Data.IsRead == 0){
+              Preview.style.fontWeight = "700";
+              Preview.style.color = "black";
+            }
          });
 
          socket.on("errMessage", function(Msg){
