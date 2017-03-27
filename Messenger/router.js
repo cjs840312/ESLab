@@ -43,7 +43,7 @@ router.route=function route(request,response){
     case '/Chat.html':
       toHTML(path,response);
       break;
-    case '/login':
+//    case '/login':
       /*
       formData = '';
       request.on("data", function(data) { formData += data;});

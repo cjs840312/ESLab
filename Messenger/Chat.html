@@ -17,13 +17,12 @@
 
       <script>
          var socket = io.connect();
-         /*
+         
          socket.emit("checkLogin", document.cookie);
          socket.on("notLogin", function(Msg){
             alert(Msg);
             location.href="./";
          });
-         */
          var screen = document.getElementById("ChatScreen");
 
          var myName,receiver,hisLog;
@@ -37,7 +36,7 @@
                screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
                screen.scrollTop=screen.scrollTopMax;
             }
-            if (hisLog[0] && hisLog[0].Sender == myName && hisLog[0].IsRead == false)
+            if (hisLog[0] && hisLog[0].Sender == myName && hisLog[0].IsRead == 1)
                document.getElementById("read").textContent="read";
             console.log(hisLog);
             socket.emit("IsRead", receiver);
@@ -75,6 +74,7 @@
             if(sender == receiver){
               screen.textContent +=(sender+": "+message+"\n");
               screen.scrollTop=screen.scrollTopMax;
+              document.getElementById('read').textContent="";
             
               socket.emit("IsRead", sender);
             }

@@ -13,14 +13,15 @@
 
       <script>
          var socket = io.connect();
-         /*
+         
          socket.emit("checkLogin", document.cookie);
          socket.on("notLogin", function(Msg){
             alert(Msg);
             location.href="./";
          });
-         */
+         
          socket.emit("showFriendList", document.cookie);
+         
          socket.on("friendList", function(Data){
             var friendList = Data.friendList;
             var onlineList = Data.onlineList;
@@ -61,9 +62,14 @@
               socket.emit("showPreview", friendList[i].friend);
          });
 
+         var AddButton = document.getElementById('AddButton');
+         var AddAccount = document.getElementById('AddAccount');
+         
          AddButton.addEventListener("click", function(){
-            document.cookie = "receiver="+AddAccount.value;
-            socket.emit("addFriend", document.cookie);  
+            if(AddAccount.value != ""){
+              document.cookie = "receiver="+AddAccount.value;
+              socket.emit("addFriend", document.cookie);
+            }
          });
          
          AddAccount.addEventListener("keydown", function(event) {

@@ -6,24 +6,57 @@
 		<h1> Register for an Account!!!!!!</h1>
       <fieldset>
          Username: <input type="text", id = 'username'> <br>
-		   Account : <input type="text", id = 'account'>  <br>
-		   Password: <input type="text", id = 'password'> <br>
-		   <input type="button", value="Done", id = 'SignUpButton'>
+		     Account : <input type="text", id = 'account'>  <br>
+		     Password: <input type="text", id = 'password'> <br>
+		     <input type="button", value="Done", id = 'SignUpButton'>
       </fieldset>
 		<script>
-			var socket = io.connect();
+       var socket = io.connect();
+       var Button = document.getElementById('SignUpButton');
+       var Username = document.getElementById('username');
+       var Account = document.getElementById('account');
+       var Password = document.getElementById('password');
+
+       Button.addEventListener("click", function(){
+          var username = Username.value;
+          var account = Account.value;
+          var password = Password.value;
+          console.log('registeration processing...');
+          console.log('account: '+account+' has signed up!!!');
+          if(username=="" || account=="" || password=="")
+            alert("Please fill in all blanks!");
+          else
+				    socket.emit("SignUp",{"username":username, "account":account,"password":password});
+          socket.on("errMessage", function(Msg){
+            console.log(Msg);
+            alert(Msg);
+          });
+          socket.on("SignUpSuccess", function(){
+            location.href = './';
+          });
+       });
+       
+       Username.addEventListener("keydown", function(event) {
+          if (event.keyCode == 13) {
+             event.preventDefault();
+             Button.click();
+          };
+       });
+       
+       Account.addEventListener("keydown", function(event) {
+          if (event.keyCode == 13) {
+             event.preventDefault();
+             Button.click();
+          };
+       });
+       
+       Password.addEventListener("keydown", function(event) {
+          if (event.keyCode == 13) {
+             event.preventDefault();
+             Button.click();
+          };
+       });
         
-			
-         var Button = document.getElementById('SignUpButton');
-			Button.addEventListener("click", function(){
-            var username = document.getElementById('username').value;
-            //console.log('usr: '+username+'!!!!');
-            var account = document.getElementById('account').value;
-            var password = document.getElementById('password').value;
-				console.log('registeration processing...');
-            console.log('account: '+account+' has signed up!!!');
-				socket.emit("SignUp",{"username":username, "account":account,"password":password});
-			});
 		</script>
 	</body>
 </html>			

@@ -19,14 +19,13 @@ var server_io = socket_io.listen(server);
 socketDict={}
 
 server_io.sockets.on('connection', function(socket)  {
-  /*
   socket.on('checkLogin', function(cookieStr){
     cookieJSON = cookie.parse(cookieStr);
     var account = cookieJSON.account;
     console.log(account+" is trying to log in...");
     if(account == undefined) socket.emit('notLogin', "Please login!");
   });
-  */
+  
   socket.on('LogIn',function(cookieStr){
      cookieJSON = cookie.parse(cookieStr);
      var account = cookieJSON.account;
@@ -52,6 +51,7 @@ server_io.sockets.on('connection', function(socket)  {
         }
      });
   });
+  
   socket.on('whoIsChatting',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
       console.log(cookieJSON);
@@ -91,18 +91,27 @@ server_io.sockets.on('connection', function(socket)  {
       if(message.length>20) Msg = Msg.slice(0,20)+"...";
       server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, IsRead: false});
   });
+  
   socket.on('SignUp', function(userInfo){
-     var username = userInfo.username;
-     console.log(username+' has signed up...');
-     var account = userInfo.account;
-     var password = userInfo.password;
-     sql.query('INSERT INTO UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
-        if(err)
-           console.error(err);
-        console.dir(rows);
-   
+      var username = userInfo.username;
+      console.log(username+' has signed up...');
+      var account = userInfo.account;
+      var password = userInfo.password;
+
+      var q = 'select * from UserInfo where account=:acc';
+      sql.query(q, {acc: account}, function(err, result){
+        if(err) throw err;
+        if(result.length>0) socket.emit('errMessage', "Account used!");
+        else{
+          sql.query('INSERT INTO UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
+            if(err)
+              console.error(err);
+            socket.emit("SignUpSuccess");
+          });
+        }
      });
   });
+  
   socket.on('showFriendList',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
       var user = cookieJSON.account;
@@ -176,7 +185,18 @@ server_io.sockets.on('connection', function(socket)  {
   socket.on('IsRead', function(sender){
       q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
       sql.query(q, {sender: sender, receiver: socket.name});
-      server_io.to(socketDict[sender]).emit("Read",socket.name);
+      //server_io.to(socketDict[sender]).emit("Read",socket.name);
+
+      q = 'select * from ChatHistory where (Sender=:sender and Receiver=:receiver) or (Sender=:receiver and Receiver=:sender) order by Time desc limit 1';
+      sql.query(q, {sender: sender, receiver: socket.name}, function(err, result){
+        if(err) throw err;
+        if(result.length>0){
+          if(result[0].Sender == sender) 
+            server_io.to(socketDict[sender]).emit("Read", socket.name);
+        }
+      
+      });
+
   });
   
   socket.on('disconnect', function(){
