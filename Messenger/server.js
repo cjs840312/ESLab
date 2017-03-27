@@ -91,12 +91,12 @@ server_io.sockets.on('connection', function(socket)  {
 
       if (receiver=="Public")
         socket.broadcast.emit("Message",{sender:"Public",message: socket.name+': '+ message});
-      else
+      else{
         server_io.to(socketDict[receiver]).emit("Message",{sender:socket.name,message:message});
         var Msg = message;
         if(message.length>20) Msg = Msg.slice(0,20)+"...";
         server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, UserRead: false, FriendRead: false});
-
+      }
       sql.query('INSERT INTO mydb.ChatHistory value("'+socket.name+'","'+receiver+'","'+message+'",CURRENT_TIMESTAMP, false)', function(err, rows) {
         if (err)
           console.error(err);
@@ -199,14 +199,26 @@ server_io.sockets.on('connection', function(socket)  {
 
   socket.on('IsRead', function(sender){
       if(sender=="Public"){
-        q = 'update ChatHistory set IsRead=true where Receiver=:receiver';
-        sql.query(q, {receiver: "Public"});
-        socket.broadcast.emit("Read", "Public");
+        q = 'select * from ChatHistory where Receiver=:receiver order by Time desc limit 1';
+        sql.query(q, {receiver: "Public"}, function(err, result){
+          if(err) throw err;
+          socket.broadcast.emit("Read", result[0].Sender);      
+  
+        });
+        //socket.broadcast.emit("Read", lastsender);
       }
       else{
         q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
         sql.query(q, {sender: sender, receiver: socket.name});
-        server_io.to(socketDict[sender]).emit("Read", socket.name);
+        q = 'select * from ChatHistory where (Sender=:sender and Receiver=:receiver) or (Sender=:receiver and Receiver=:sender) order by Time desc limit 1';
+        sql.query(q, {sender: sender, receiver: socket.name}, function(err, result){
+          if(err) throw err;
+          if(result.length>0){
+            if(result[0].Sender == sender) 
+              server_io.to(socketDict[sender]).emit("Read", socket.name);
+          }
+      
+        });
       }
       
       //server_io.to(socketDict[sender]).emit("Read",socket.name);

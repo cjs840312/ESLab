@@ -98,9 +98,15 @@
          });
 
          socket.on("Read",function(Data){
-            if(Data==receiver){
-               console.log('read') 
-               document.getElementById("read").textContent="read";
+            if(receiver=="Public"){
+              if(Data == myName) 
+                document.getElementById("read").textContent="read";
+            }
+            else{
+              if(Data==receiver){
+                 console.log('read') 
+                 document.getElementById("read").textContent="read";
+              }
             }
          });
          
