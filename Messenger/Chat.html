@@ -5,6 +5,7 @@
    </head>
    <body>
       <h1> Chat Room ~ <button type="button", id="LogoutButton">Logout</button></h1>
+      <h2 id="receiverAcc"></h2>
       <div id="ChatScreen" style="width:497px;height:200px;border:1px #000000 solid; overflow:auto; white-space: pre-line;word-break: break-all;"></div>
       <div id="read"></div>
       <br>
@@ -31,6 +32,9 @@
             myName=Data.sender;
             receiver=Data.receiver;
             hisLog=Data.history;
+            online=Data.isOnline;
+            document.getElementById("receiverAcc").innerHTML=receiver+"<span id='isOnline' style='color:green'></span>";
+            document.getElementById("isOnline").innerHTML="&#9679";
 
             if(receiver!="Public"){
                for (i = hisLog.length-1; i >=0; i--) { 
@@ -98,6 +102,16 @@
                console.log('read') 
                document.getElementById("read").textContent="read";
             }
+         });
+         
+         socket.on("whoIsOnline", function(user){
+            if(user==receiver)
+              document.getElementById("isOnline").innerHTML = "&#9679";
+         });
+
+         socket.on("whoIsOffline", function(user){
+            if(user==receiver)
+              document.getElementById("isOnline").innerHTML = "";
          });
 
       </script>

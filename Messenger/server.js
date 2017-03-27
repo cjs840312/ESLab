@@ -66,7 +66,15 @@ server_io.sockets.on('connection', function(socket)  {
       sql.query(q, function(err, rows) {
         if (err)
           console.error(err);
-        socket.emit('chatPair',{"sender":sender,"receiver":receiver,"history":rows})
+        var isOnline = socketDict[receiver] != undefined
+        socket.emit('chatPair',{"sender":sender,"receiver":receiver,"history":rows, isOnline:isOnline})
+        if(rows.length>0){
+          if(rows[0].Sender == receiver){
+            server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:"You: "+rows[0].Content, UserRead: true, FriendRead: true});
+      
+          }
+
+        }
       });   
         
       q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
@@ -87,7 +95,7 @@ server_io.sockets.on('connection', function(socket)  {
         server_io.to(socketDict[receiver]).emit("Message",{sender:socket.name,message:message});
         var Msg = message;
         if(message.length>20) Msg = Msg.slice(0,20)+"...";
-        server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, IsRead: false});
+        server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, UserRead: false, FriendRead: false});
 
       sql.query('INSERT INTO mydb.ChatHistory value("'+socket.name+'","'+receiver+'","'+message+'",CURRENT_TIMESTAMP, false)', function(err, rows) {
         if (err)
@@ -134,7 +142,7 @@ server_io.sockets.on('connection', function(socket)  {
           else isOnline.push(false);
 
         }
-        socket.emit('friendList', {friendList: result, onlineList: isOnline});
+        socket.emit('friendList', {friendList: result, onlineList: isOnline, usr:user});
       });      
 
       socket.broadcast.emit('whoIsOnline', user);
@@ -178,13 +186,14 @@ server_io.sockets.on('connection', function(socket)  {
     sql.query(q, {sender: user, receiver: friend}, function(err, result){
       if(result.length>0){
         var Msg = result[0].Content;
-        var IsRead = result[0].IsRead;
+        var UserRead = result[0].IsRead;
+        var FriendRead = result[0].IsRead;
         if(Msg.length>20) Msg = Msg.slice(0,20)+"...";
         if(result[0].Sender==user) 
-          socket.emit('Preview', {friend: friend, Msg: 'You: '+Msg, IsRead: true});
-        else socket.emit('Preview', {friend: friend, Msg: Msg, IsRead: IsRead});
+          socket.emit('Preview', { friend: friend, Msg: 'You: '+Msg, UserRead: true, FriendRead: FriendRead});
+        else socket.emit('Preview', { friend: friend, Msg: Msg, UserRead: UserRead, FriendRead: false});
       }
-      else socket.emit('Preview', {friend: friend, Msg:'Start Chatting!', IsRead: true});
+      else socket.emit('Preview', {friend: friend, Msg:'Start Chatting!', UserRead: true, FriendRead: false});
     });
   });
 

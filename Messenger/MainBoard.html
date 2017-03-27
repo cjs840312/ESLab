@@ -6,11 +6,13 @@
    <body>
 
       <h1> Friend List <button type="button", id="LogoutButton">Logout</button> </h1>
+      <h2 id="userAcc"></h2>
       <form method="post">
          <label>Account : </label> 
          <input type="text", id="AddAccount"> 
          <input type="button", value="Add", id="AddButton">
       </form>
+
 
       <a href="./Chat.html" onclick="document.cookie='receiver=Public';"> Public Chatroom ~</a>
       <br>
@@ -27,6 +29,8 @@
          socket.emit("showFriendList", document.cookie);
          
          socket.on("friendList", function(Data){
+            var user = Data.usr;
+            document.getElementById('userAcc').innerHTML = "Hi "+user+"!";
             var friendList = Data.friendList;
             var onlineList = Data.onlineList;
             for(i=0; i<friendList.length; ++i){
@@ -45,9 +49,13 @@
                Online.style.float = "right";
                var Preview = document.createElement('div');
                Preview.style.color = "grey";
+               var IsRead = document.createElement('div');
+               IsRead.style.color = "grey";
+               IsRead.style.float = "right";
 
-               newDiv.appendChild(Account);
                newDiv.appendChild(Online);
+               newDiv.appendChild(Account);
+               newDiv.appendChild(IsRead);
                newDiv.appendChild(Preview);
                newDiv.addEventListener('mouseover', function(){
                   this.style.backgroundColor = "#E0E0E0";
@@ -105,9 +113,13 @@
             Online.style.float = "right";
             var Preview = document.createElement('div');
             Preview.style.color = "grey";
+            var IsRead = document.createElement('div');
+            IsRead.style.color = "grey";
+            IsRead.style.float = "right";
 
-            newDiv.appendChild(Account);
             newDiv.appendChild(Online);
+            newDiv.appendChild(Account);
+            newDiv.appendChild(IsRead);
             newDiv.appendChild(Preview);
             newDiv.addEventListener('mouseover', function(){
                this.style.backgroundColor = "#E0E0E0";
@@ -124,11 +136,15 @@
          });
 
          socket.on("Preview", function(Data){
-            var Preview = document.getElementById(Data.friend).childNodes[2];
+            var IsRead = document.getElementById(Data.friend).childNodes[2];
+            var Preview = document.getElementById(Data.friend).childNodes[3];
             Preview.innerHTML = Data.Msg;
-            if(Data.IsRead == 0){
+            if(Data.UserRead == 0){
               Preview.style.fontWeight = "700";
               Preview.style.color = "black";
+            }
+            if(Data.FriendRead == 1){
+              IsRead.innerHTML = "&#10004";
             }
          });
 
@@ -138,12 +154,12 @@
 
          socket.on("whoIsOnline", function(user){
             var Friend = document.getElementById(user);
-            if(Friend!=undefined) Friend.childNodes[1].innerHTML = "&#9679";
+            if(Friend!=undefined) Friend.childNodes[0].innerHTML = "&#9679";
          });
 
          socket.on("whoIsOffline", function(user){
             var Friend = document.getElementById(user);
-            if(Friend!=undefined) Friend.childNodes[1].innerHTML = "";
+            if(Friend!=undefined) Friend.childNodes[0].innerHTML = "";
          });
 
 
