@@ -101,7 +101,8 @@ server_io.sockets.on('connection', function(socket)  {
       var q = 'select * from UserInfo where account=:acc';
       sql.query(q, {acc: account}, function(err, result){
         if(err) throw err;
-        if(result.length>0) socket.emit('errMessage', "Account used!");
+        if(result.length>0)
+          socket.emit('errMessage', "Account used!");
         else{
           sql.query('INSERT INTO UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
             if(err)

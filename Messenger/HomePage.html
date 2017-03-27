@@ -38,18 +38,18 @@
                   socket.emit('LogIn',document.cookie);
                   console.log('LogIn information sent...');
                }
-               socket.on('LogInGo',function(msg){
-                  console.log('Get reponse from server for permission...');
-                  var p = msg.permission;
-                  if(p == 1){
-                     console.log('LogIn granted...');
-                     location.href = "/MainBoard.html";
-                  } else {
-                     alert('LogIn rejected...');
-                  }
-               });
             });
             
+            socket.on('LogInGo',function(msg){
+               console.log('Get reponse from server for permission...');
+               var p = msg.permission;
+               if(p == 1){
+                  console.log('LogIn granted...');
+                  location.href = "/MainBoard.html";
+               } else {
+                  alert('LogIn rejected...');
+               }
+            });
             
             Account.addEventListener("keydown", function(event) {
                if (event.keyCode == 13) {

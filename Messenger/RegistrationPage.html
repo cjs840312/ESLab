@@ -27,13 +27,14 @@
             alert("Please fill in all blanks!");
           else
 				    socket.emit("SignUp",{"username":username, "account":account,"password":password});
-          socket.on("errMessage", function(Msg){
-            console.log(Msg);
-            alert(Msg);
-          });
-          socket.on("SignUpSuccess", function(){
-            location.href = './';
-          });
+       });
+       
+       socket.on("errMessage", function(Msg){
+          console.log(Msg);
+          alert(Msg);
+       });
+       socket.on("SignUpSuccess", function(){
+          location.href = './';
        });
        
        Username.addEventListener("keydown", function(event) {
