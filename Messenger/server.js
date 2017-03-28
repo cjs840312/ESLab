@@ -64,7 +64,18 @@ server_io.sockets.on('connection', function(socket)  {
       if(message.length>20) Msg = Msg.slice(0,20)+"...";
       server_io.to(socketDict[receiver]).emit("Preview",{friend: socket.name, Msg:Msg, IsRead: false});
   });
-  
+  socket.on('SignUp', function(userInfo){
+     var username = userInfo.username;
+     console.log(username+' has signed up...');
+     var account = userInfo.account;
+     var password = userInfo.password;
+     sql.query('INSERT INTO mydb.UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
+        if(err)
+           console.error(err);
+        console.dir(rows);
+   
+     });
+  });
   socket.on('showFriendList',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
       var user = cookieJSON.account;

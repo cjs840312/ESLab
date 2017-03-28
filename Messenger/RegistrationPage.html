@@ -4,26 +4,26 @@
 	</head>
 	<body>
 		<h1> Register for an Account!!!</h1>
-		Account : <input type="text", id="account"> <br>
-		Password: <input type="password", id = "password"> <br>
-		<input type=submit value="Done", id = "Button", onclick="goHome();">
+      <fieldset>
+         Username: <input type="text", id = 'username'> <br>
+		   Account : <input type="text", id = 'account'>  <br>
+		   Password: <input type="text", id = 'password'> <br>
+		   <input type="button", value="Done", id = 'SignUpButton'>
+      </fieldset>
 		<script>
-			//var socket = io.connect();
+			var socket = io.connect();
+        
 			
-			function goHome(){
-				alert("Moving back to Login Webpage");
-				window.location.href="http://localhost:3000/";
-			}			
-			
-			/*
-			var Button = document.getElementById("Button");
-			Button.addEventListener("click", functioin(){
-				console.log('registeration processing...')
-				var account = document.getElementById("account").value;
-				var password = document.getElementById("password").value;
-				socket.emit("User Login",{"account":account,"password":password});
-			})
-			*/
+         var Button = document.getElementById('SignUpButton');
+			Button.addEventListener("click", function(){
+            var username = document.getElementById('username').value;
+            console.log('usr: '+username+'!!!!');
+            var account = document.getElementById('account').value;
+            var password = document.getElementById('password').value;
+				console.log('registeration processing...');
+            console.log('account: '+account+' has signed up!!!');
+				socket.emit("SignUp",{"username":username, "account":account,"password":password});
+			});
 		</script>
 	</body>
 </html>			
