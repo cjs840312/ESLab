@@ -6,7 +6,7 @@
    <body>
       <h1> Chat Room ~ <button type="button", id="LogoutButton">Logout</button></h1>
       <div id="ChatScreen" style="width:497px;height:200px;border:1px #000000 solid; overflow:auto; white-space: pre-line;word-break: break-all;"></div>
-
+      <div id="read"></div>
       <br>
 
       <form method="post">
@@ -37,7 +37,10 @@
                screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
                screen.scrollTop=screen.scrollTopMax;
             }
+            if (hisLog[0].Sender == myName && hisLog[0].IsRead == false)
+               document.getElementById("read").textContent="read";
             console.log(hisLog);
+            socket.emit("IsRead", receiver);
          });
          
 
@@ -50,6 +53,7 @@
 
             socket.emit("Message",{receiver:receiver,"message":message});
 
+            document.getElementById("read").textContent="";
             textBox.value="";
             screen.textContent +=(myName+": "+message+"\n");
             screen.scrollTop=screen.scrollTopMax;
@@ -79,6 +83,11 @@
          LogoutButton.addEventListener("click", function(){
             document.cookie = "account=";
             location.href = "./";
+         });
+
+         socket.on("Read",function(Data){
+               console.log('read') 
+               document.getElementById("read").textContent="read";
          });
 
       </script>
