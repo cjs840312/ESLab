@@ -19,12 +19,35 @@ var server_io = socket_io.listen(server);
 socketDict={}
 
 server_io.sockets.on('connection', function(socket)  {
+  /*
   socket.on('checkLogin', function(cookieStr){
     cookieJSON = cookie.parse(cookieStr);
     var account = cookieJSON.account;
+    console.log(account+" is trying to log in...");
     if(account == undefined) socket.emit('notLogin', "Please login!");
   });
-
+  */
+  socket.on('LogIn',function(cookieStr){
+     cookieJSON = cookie.parse(cookieStr);
+     var account = cookieJSON.account;
+     var password = cookieJSON.password;
+     //console.log('cookie account: '+cookie_account);
+     //var account = info.account;
+     //var password = info.password;
+     console.log(account+' tries to log in with password='+password);
+     var q = 'select * from UserInfo where account=:acc and password=:pass';
+     var permission = 0;
+     sql.query(q,{acc:account, pass:password}, function(err,rows){
+        if(err){
+           throw err;
+           socket.emit('LogInGo',{'permission':permission});
+        } else {
+           console.log('find a user with username: '+rows[0].username);
+           permission = 1;
+           socket.emit('LogInGo',{'permission':permission});
+        }
+     });
+  });
   socket.on('whoIsChatting',function(cookieStr){
       cookieJSON=cookie.parse(cookieStr);
       console.log(cookieJSON);
@@ -69,7 +92,7 @@ server_io.sockets.on('connection', function(socket)  {
      console.log(username+' has signed up...');
      var account = userInfo.account;
      var password = userInfo.password;
-     sql.query('INSERT INTO mydb.UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
+     sql.query('INSERT INTO UserInfo value("'+username+'","'+account+'","'+password+'")',function(err, rows){
         if(err)
            console.error(err);
         console.dir(rows);

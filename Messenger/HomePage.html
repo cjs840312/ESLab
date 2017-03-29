@@ -1,19 +1,55 @@
 <html>
    <head>
+      <script src="/socket.io/socket.io.js"></script>
    </head>
    <body>
 
       <h1> Welcome to messenger !! </h1>
       <form method="post" action="./login">
          <fieldset>
-            <label>Account  : </label> <input type="text"    , name ="account"/>  <br>
-            <label>Password : </label> <input type="password", name ="password"/> <br>
-            <input type ="submit" value="Login" id="LogButton" > 
+            <label>Account  : </label> <input type="text"    , id ="account"/>  <br>
+            <label>Password : </label> <input type="password", id ="password"/> <br>
+            <input type ="submit" value="Log In" id="LogButton" > 
             <a href = "./RegistrationPage.html">
-               <input type ="button" value="Singup" id="SingupButton" >
+               <input type ="button" value="Sign Up" id="SingupButton" >
             </a>
-         </fieldset>         
+         </fieldset>
+         <script>
+            var socket = io.connect();
+            var Button = document.getElementById('LogButton');
+            Button.addEventListener("click", function(){
+               console.log("LogIn button clicked...");
+               //document.cookie = "account="+account.value;
+               var account = document.getElementById('account').value;
+               var password = document.getElementById('password').value;
+               var str = "account="+account+";password="+password+";";
+               console.log(str);
+               console.log("user inputs account: "+account+"...");
+               console.log("user inputs password: "+password+"...");
+               document.cookie = "account="+account;
+               document.cookie = "password="+password;
+               console.log("cookie: "+document.cookie);
+               //socket.emit('LogIn',{'account':account, 'password':password});
+               
+               socket.emit('LogIn',document.cookie);
+               console.log('LogIn information sent...');
+               socket.on('LogInGo',function(msg){
+                  console.log('Get reponse from server for permission...');
+                  var p = msg.permission;
+                  if(p == 1){
+                     console.log('LogIn granted...');
+                     location.href = "/MainBoard.html"
+                  } else {
+                     console.log('logIn rejected...');
+                  }
+                  
+               
+               });
+            });
+            
+         </script>
       </form>
+      
 
   </body>
 </html>

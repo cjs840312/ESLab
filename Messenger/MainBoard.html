@@ -13,13 +13,13 @@
 
       <script>
          var socket = io.connect();
-         
+         /*
          socket.emit("checkLogin", document.cookie);
          socket.on("notLogin", function(Msg){
             alert(Msg);
             location.href="./";
          });
-
+         */
          socket.emit("showFriendList", document.cookie);
          socket.on("friendList", function(Data){
             var friendList = Data.friendList;

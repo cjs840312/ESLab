@@ -44,6 +44,7 @@ router.route=function route(request,response){
       toHTML(path,response);
       break;
     case '/login':
+      /*
       formData = '';
       request.on("data", function(data) { formData += data;});
       request.on("end", function() {
@@ -51,8 +52,15 @@ router.route=function route(request,response){
         user = querystring.parse(formData);
         account=user.account;
         password=user.password;
+        //console.log("yeahhhhhhh");
         console.log(account);
         console.log(password);
+        if(account = "123"){
+           console.log("123 tries to log in...");
+        }
+        else{
+           console.log("non-123 tries to log in...");
+        }
         response.writeHead(303, {"Location": "./MainBoard.html","Content-Type": "text/html",'Set-Cookie': "account="+account});
         response.end();
       });
@@ -60,6 +68,7 @@ router.route=function route(request,response){
     default:
       error404(response);
       break;
+      */
   }
 }
 
