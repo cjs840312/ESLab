@@ -37,14 +37,18 @@ server_io.sockets.on('connection', function(socket)  {
      console.log(account+' tries to log in with password='+password);
      var q = 'select * from UserInfo where account=:acc and password=:pass';
      var permission = 0;
-     sql.query(q,{acc:account, pass:password}, function(err,rows){
-        if(err){
-           throw err;
+     sql.query(q,{acc:account, pass:password}, function(error,rows){
+        if(error){
+           throw error;
+           socket.emit('LogInGo',{'permission':permission});
+        } else if(rows!=""){
+           
+           permission = 1;
+           console.log('find a user with username: '+rows[0].username);
            socket.emit('LogInGo',{'permission':permission});
         } else {
-           console.log('find a user with username: '+rows[0].username);
-           permission = 1;
-           socket.emit('LogInGo',{'permission':permission});
+           permission = 0;
+           socket.emit('LogInGo',{'permission':permission})
         }
      });
   });
