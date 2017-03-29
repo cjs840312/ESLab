@@ -37,7 +37,7 @@
                screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
                screen.scrollTop=screen.scrollTopMax;
             }
-            if (hisLog[0].Sender == myName && hisLog[0].IsRead == false)
+            if (hisLog[0] && hisLog[0].Sender == myName && hisLog[0].IsRead == false)
                document.getElementById("read").textContent="read";
             console.log(hisLog);
             socket.emit("IsRead", receiver);
@@ -86,8 +86,10 @@
          });
 
          socket.on("Read",function(Data){
+            if(Data==receiver){
                console.log('read') 
                document.getElementById("read").textContent="read";
+            }
          });
 
       </script>

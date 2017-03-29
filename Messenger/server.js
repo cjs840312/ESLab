@@ -176,7 +176,7 @@ server_io.sockets.on('connection', function(socket)  {
   socket.on('IsRead', function(sender){
       q = 'update ChatHistory set IsRead=true where Sender=:sender and Receiver=:receiver';
       sql.query(q, {sender: sender, receiver: socket.name});
-      server_io.to(socketDict[sender]).emit("Read"," I read it ");
+      server_io.to(socketDict[sender]).emit("Read",socket.name);
   });
   
   socket.on('disconnect', function(){
