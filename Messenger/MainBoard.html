@@ -1,6 +1,7 @@
 <html>
    <head>
       <script src="/socket.io/socket.io.js"></script>
+      <meta charset="UTF-8">
    </head>
    <body>
 
@@ -11,6 +12,9 @@
          <input type="button", value="Add", id="AddButton">
       </form>
 
+      <a href="./Chat.html" onclick="document.cookie='receiver=Public';"> Public Chatroom ~</a>
+      <br>
+      <br>
       <script>
          var socket = io.connect();
          

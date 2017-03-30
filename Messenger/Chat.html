@@ -1,7 +1,7 @@
 <html>
    <head>
-      <script src="/socket.io/socket.io.js">
-      </script>
+      <script src="/socket.io/socket.io.js"></script>
+      <meta charset="UTF-8">
    </head>
    <body>
       <h1> Chat Room ~ <button type="button", id="LogoutButton">Logout</button></h1>
@@ -32,14 +32,15 @@
             receiver=Data.receiver;
             hisLog=Data.history;
 
-            for (i = hisLog.length-1; i >=0; i--) { 
-               screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
-               screen.scrollTop=screen.scrollTopMax;
-            }
-            if (hisLog[0] && hisLog[0].Sender == myName && hisLog[0].IsRead == 1)
-               document.getElementById("read").textContent="read";
-            console.log(hisLog);
-            socket.emit("IsRead", receiver);
+            if(receiver!="Public"){
+               for (i = hisLog.length-1; i >=0; i--) { 
+                  screen.textContent +=(hisLog[i].Sender+": "+hisLog[i].Content+"\n");
+                  screen.scrollTop=screen.scrollTopMax;
+               }
+               if (hisLog[0] && hisLog[0].Sender == myName && hisLog[0].IsRead == 1 )
+                  document.getElementById("read").textContent="read";
+               socket.emit("IsRead", receiver);
+            }            
          });
          
 
@@ -59,11 +60,13 @@
          });
 
          textBox.addEventListener("keydown", function(event) {
+            
             if (event.keyCode == 13 && !event.shiftKey) {
                event.preventDefault();
                textBox.value=textBox.value.trim();
                SendButton.click();
             };
+
          });
 
          
@@ -72,16 +75,21 @@
             var sender=Data.sender 
             var message=Data.message
             if(sender == receiver){
-              screen.textContent +=(sender+": "+message+"\n");
-              screen.scrollTop=screen.scrollTopMax;
-              document.getElementById('read').textContent="";
+               if (receiver=="Public"){
+               	screen.textContent +=(message+"\n");
+               }
+					else{
+						screen.textContent +=(sender+": "+message+"\n");
+					}
+					screen.scrollTop=screen.scrollTopMax;
+					document.getElementById('read').textContent="";
             
               socket.emit("IsRead", sender);
             }
          });
 
          LogoutButton.addEventListener("click", function(){
-            document.cookie = "account=";
+            document.cookie = "account=;password=;receiver=;";
             location.href = "./";
          });
 
