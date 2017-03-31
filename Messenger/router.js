@@ -64,11 +64,11 @@ router.route=function route(request,response){
         response.writeHead(303, {"Location": "./MainBoard.html","Content-Type": "text/html",'Set-Cookie': "account="+account});
         response.end();
       });
-      break;
+      break;*/
     default:
       error404(response);
       break;
-      */
+      
   }
 }
 
