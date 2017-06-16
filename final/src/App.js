@@ -280,6 +280,18 @@ class GroupItem extends Component{
 
 	handleTurn(){
 		// TODO....
+		fetch('/postTurnON', {
+        	method: 'POST',
+         	headers: {
+          		'Accept': 'application/json',
+          		'Content-Type': 'application/json',
+         	},
+          	body: JSON.stringify({
+			 	"groupName":this.props.name
+         })
+	
+
+		})
 	}
 
 	render() {

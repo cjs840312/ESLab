@@ -10,6 +10,9 @@ var sql = new mariasql({
   db: 'ESfinal'
 });
 
+var dict = {}
+
+
 const server = express();
 var expressWs = require('express-ws')(server);
 
@@ -54,7 +57,7 @@ server.post('/Signup', (req, res) => {
 });
 
 server.post('/createGroup', (req, res) => {
-  console.log(req.body)
+  //console.log(req.body)
   var q = "select * from Groups where groupName=:groupName";
   sql.query(q, {groupName: req.body.groupName},function (err,result){
     if(result.length===0){
@@ -85,7 +88,7 @@ server.post('/getList', (req, res) => {
 });
 
 server.post('/getMember', (req, res) => {
-  console.log(req.body)
+  //console.log(req.body)
   var q = "select * from Groups where groupName=:groupName";
   sql.query(q, {groupName:req.body.groupName},function (err,result){
        res.send(result);
@@ -94,7 +97,19 @@ server.post('/getMember', (req, res) => {
 
 server.ws('/', function(ws, req) {
   ws.on('message', function(msg) {
-    console.log(msg);
+	console.log(dict)
+	let temp={}
+	temp[msg]=ws
+	dict = Object.assign(dict,temp)
+console.log(dict)
     ws.send('123');
   });
 });
+
+server.post('/postTurnOn', (req, res) => {
+  console.log(req.body)
+  console.log(dict)
+  dict[req.body.groupName].send('turnON')
+  
+});
+
